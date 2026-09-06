@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>3 жас — үлкен әлемге алғашқы қадам</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFFBF2;
+    --coral:#FF6F59;
+    --coral-deep:#E85A45;
+    --yellow:#FFC93C;
+    --leaf:#4CAF7D;
+    --leaf-deep:#3B8F63;
+    --sky:#7FC8E8;
+    --plum:#3A2E39;
+    --plum-soft:#6b5c68;
+    --card:#FFFFFF;
+    --radius:28px;
+    --shadow: 0 18px 40px -18px rgba(58,46,57,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%; width:100%;
+    overflow:hidden;
+    font-family:'Nunito', sans-serif;
+    color:var(--plum);
+    background:var(--cream);
+    -webkit-tap-highlight-color: transparent;
+  }
+  h1,h2,h3,.display{
+    font-family:'Baloo 2', sans-serif;
+    margin:0;
+  }
+  ::selection{ background: var(--yellow); }
+
+  .sky{
+    position:fixed; inset:0; z-index:0;
+    background: linear-gradient(180deg, #EAF7FC 0%, #FDF6E9 55%, #FFF9EE 100%);
+    overflow:hidden;
+  }
+  .sun{
+    position:absolute; top:6%; right:7%;
+    width:110px; height:110px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #FFE79A, var(--yellow));
+    box-shadow: 0 0 60px 12px rgba(255,201,60,0.35);
+    animation: spin 40s linear infinite;
+  }
+  .sun::before{
+    content:""; position:absolute; inset:-26px;
+    background: repeating-conic-gradient(from 0deg, rgba(255,201,60,0.55) 0deg 3deg, transparent 3deg 30deg);
+    border-radius:50%; opacity:.7;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg);} }
+  .cloud{ position:absolute; opacity:.9; background:#fff; border-radius:100px; filter: drop-shadow(0 8px 10px rgba(58,46,57,0.06)); }
+  .cloud::before, .cloud::after{ content:""; position:absolute; background:#fff; border-radius:50%; }
+  .c1{ width:120px; height:40px; top:14%; left:-10%; animation: drift 55s linear infinite; }
+  .c1::before{ width:55px; height:55px; top:-28px; left:14px; }
+  .c1::after{ width:38px; height:38px; top:-18px; left:66px; }
+  .c2{ width:90px; height:32px; top:28%; left:-15%; animation: drift 70s linear infinite 8s; }
+  .c2::before{ width:42px; height:42px; top:-20px; left:10px; }
+  .c2::after{ width:30px; height:30px; top:-14px; left:50px; }
+  .c3{ width:70px; height:26px; top:8%; left:-20%; animation: drift 62s linear infinite 20s; }
+  .c3::before{ width:34px; height:34px; top:-16px; left:8px; }
+  .c3::after{ width:24px; height:24px; top:-10px; left:40px; }
+  @keyframes drift{ to{ transform: translateX(140vw); } }
+  .hill{ position:absolute; bottom:-6%; left:-5%; width:110%; height:16%; background: var(--leaf); border-radius: 50% 50% 0 0 / 100% 100% 0 0; opacity:.18; }
+
+  .deck{ position:relative; width:100vw; height:100vh; z-index:1; }
+
+  .slide{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+    padding: 7vh 6vw 12vh;
+    opacity:0; visibility:hidden;
+    transform: scale(0.94) translateY(10px);
+    transition: opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1), visibility 0s linear .55s;
+    overflow-y:auto;
+  }
+  .slide.active{
+    opacity:1; visibility:visible; transform: scale(1) translateY(0);
+    transition: opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1);
+    z-index:3;
+  }
+  .slide.leaving-next{ transform: scale(1.04) translateY(-14px); }
+  .slide.leaving-prev{ transform: scale(1.04) translateY(14px); }
+
+  .card{
+    background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
+    max-width: 880px; width:100%; max-height: 100%;
+    padding: clamp(24px,4vw,56px); position:relative;
+  }
+
+  .eyebrow-badge{
+    display:inline-flex; align-items:center; gap:8px;
+    background: rgba(255,111,89,0.12); color: var(--coral-deep); font-weight:800;
+    font-size:.8rem; letter-spacing:.02em; padding:7px 16px; border-radius:999px; margin-bottom:18px;
+  }
+  .headline{ font-size: clamp(1.6rem, 3.6vw, 2.6rem); font-weight:700; line-height:1.15; color:var(--plum); margin-bottom:.5em; }
+  .lede{ font-size: clamp(1rem, 1.6vw, 1.2rem); line-height:1.6; color:var(--plum-soft); font-weight:600; }
+  .quote{ font-family:'Baloo 2', sans-serif; font-style: italic; font-size: clamp(1.15rem, 2.2vw, 1.55rem); color: var(--coral-deep); line-height:1.45; padding: 18px 24px; border-radius: 18px; background: rgba(255,201,60,0.16); margin: 20px 0; }
+  .quote.plain{ font-style:normal; color:var(--plum); background:rgba(76,175,125,0.12); }
+
+  ul.points{ list-style:none; padding:0; margin: 18px 0 0; display:grid; gap:12px; }
+  ul.points li{ display:flex; align-items:flex-start; gap:12px; font-weight:700; font-size:1.02rem; color:var(--plum); }
+  ul.points li .dot{ flex:0 0 auto; width:34px; height:34px; border-radius:50%; display:flex; align-items:center; justify-content:center; background: var(--sky); font-size:1.05rem; }
+
+  .btn{
+    font-family:'Baloo 2', sans-serif; font-weight:700; font-size:1rem; border:none; cursor:pointer;
+    padding: 13px 26px; border-radius: 999px; background: var(--coral); color:#fff;
+    box-shadow: 0 10px 22px -8px rgba(255,111,89,0.6); transition: transform .18s ease, box-shadow .18s ease;
+  }
+  .btn:hover{ transform: translateY(-2px); box-shadow: 0 14px 26px -8px rgba(255,111,89,0.7); }
+  .btn:active{ transform: translateY(0px) scale(.97); }
+  .btn.secondary{ background: transparent; color: var(--coral-deep); box-shadow:none; border:2px solid var(--coral); }
+  .btn.green{ background: var(--leaf); box-shadow: 0 10px 22px -8px rgba(76,175,125,0.6); }
+  .btn:disabled{ opacity:.45; cursor:default; transform:none; box-shadow:none; }
+
+  input[type=text], textarea{
+    font-family:'Nunito', sans-serif; font-weight:700; font-size:1rem; padding: 12px 16px; border-radius: 14px;
+    border: 2px solid #F0E6D6; background: #FFFDF8; color: var(--plum); width:100%; outline:none;
+    transition: border-color .2s ease;
+  }
+  input[type=text]:focus, textarea:focus{ border-color: var(--coral); }
+  textarea{ resize:vertical; min-height:90px; font-weight:600; line-height:1.5; }
+
+  .nav-arrow{
+    position:fixed; top:50%; transform: translateY(-50%); width:52px; height:52px; border-radius:50%;
+    background: rgba(255,255,255,0.85); border:none; cursor:pointer; box-shadow: 0 10px 24px -10px rgba(58,46,57,0.35);
+    display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:var(--coral-deep); z-index:20;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .nav-arrow:hover{ background:#fff; transform: translateY(-50%) scale(1.08); }
+  .nav-arrow:disabled{ opacity:0; pointer-events:none; }
+  .nav-prev{ left: 3vw; }
+  .nav-next{ right: 3vw; }
+
+  .dots{ position:fixed; bottom: 3.2vh; left:50%; transform:translateX(-50%); display:flex; gap:9px; z-index:20; background: rgba(255,255,255,0.7); padding:9px 14px; border-radius:999px; backdrop-filter: blur(6px); }
+  .dot{ width:9px; height:9px; border-radius:50%; background: #E4D9C6; cursor:pointer; border:none; padding:0; transition: all .25s ease; }
+  .dot.active{ width:24px; background: var(--coral); border-radius:6px; }
+
+  .counter{ position:fixed; top:3vh; right:3vw; z-index:20; font-family:'Baloo 2', sans-serif; font-weight:700; color: var(--plum-soft); background: rgba(255,255,255,0.7); padding:7px 16px; border-radius:999px; font-size:.9rem; backdrop-filter: blur(6px); }
+  .progressbar{ position:fixed; top:0; left:0; height:4px; background: var(--coral); z-index:25; transition: width .5s ease; }
+
+  .title-slide .card{ text-align:center; background:transparent; box-shadow:none; max-width:780px; }
+  .balloon-row{ display:flex; gap:14px; justify-content:center; margin-bottom:6px; }
+  .balloon{ font-size: 2.6rem; animation: bob 3.2s ease-in-out infinite; }
+  .balloon:nth-child(2){ animation-delay:.4s; }
+  .balloon:nth-child(3){ animation-delay:.8s; }
+  @keyframes bob{ 0%,100%{ transform: translateY(0);} 50%{ transform: translateY(-14px);} }
+  .title-slide h1{ font-size: clamp(1.9rem, 5vw, 3.1rem); color: var(--coral-deep); line-height:1.15; }
+  .title-slide .sub{ font-family:'Baloo 2', sans-serif; font-size: clamp(1.05rem, 2vw, 1.4rem); color: var(--leaf-deep); margin-top:14px; font-weight:600; }
+  .title-slide .meta{ margin-top:26px; color:var(--plum-soft); font-weight:700; }
+
+  .flip-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:16px; margin-top:22px; }
+  .flip-card{ perspective:1200px; height:150px; cursor:pointer; }
+  .flip-inner{ position:relative; width:100%; height:100%; transform-style:preserve-3d; transition: transform .6s cubic-bezier(.4,0,.2,1); }
+  .flip-card.flipped .flip-inner{ transform: rotateY(180deg); }
+  .flip-face{ position:absolute; inset:0; backface-visibility:hidden; border-radius:18px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:12px; gap:6px; }
+  .flip-front{ background: var(--yellow); color: var(--plum); font-family:'Baloo 2'; font-size:1.25rem; font-weight:700; }
+  .flip-front span.tap{ font-size:.72rem; font-weight:700; color:var(--plum-soft); opacity:.75; }
+  .flip-back{ background: var(--plum); color:#fff; transform: rotateY(180deg); font-size:.88rem; font-weight:700; line-height:1.4; }
+
+  .scenario{ background:#FFF7EA; border-radius:18px; padding:18px 20px; margin-top:16px; }
+  .scenario p.q{ font-weight:800; margin:0 0 10px; }
+  .reveal-box{ display:none; margin-top:12px; }
+  .reveal-box.shown{ display:block; animation: pop .35s ease; }
+  @keyframes pop{ from{ opacity:0; transform:scale(.92);} to{opacity:1; transform:scale(1);} }
+  .bad{ color:#C0392B; font-weight:700; }
+  .good{ color: var(--leaf-deep); font-weight:800; margin-top:6px; }
+
+  .quiz-grid{ display:grid; gap:14px; margin-top:18px; }
+  .quiz-item label{ display:block; font-weight:800; margin-bottom:6px; font-size:.95rem; }
+
+  .timer-wrap{ display:flex; flex-direction:column; align-items:center; gap:18px; margin-top:14px; }
+  .timer-ring{ position:relative; width:180px; height:180px; }
+  .timer-ring svg{ transform: rotate(-90deg); }
+  .timer-ring .bg{ fill:none; stroke:#F0E6D6; stroke-width:12; }
+  .timer-ring .fg{ fill:none; stroke: var(--coral); stroke-width:12; stroke-linecap:round; stroke-dasharray: 502; stroke-dashoffset:0; transition: stroke-dashoffset 1s linear, stroke .3s ease; }
+  .timer-num{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2'; font-size:2.6rem; font-weight:700; color:var(--plum); }
+  .timer-msg{ font-weight:800; color: var(--leaf-deep); text-align:center; min-height:1.4em; }
+
+  .tree-area{ position:relative; height:250px; margin-top:10px; }
+  .trunk{ position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:26px; height:80px; background: linear-gradient(180deg,#B98554,#8A5F39); border-radius:6px 6px 2px 2px; }
+  .canopy{ position:absolute; bottom:56px; left:50%; transform:translateX(-50%); width:280px; height:170px; }
+  .canopy .blob{ position:absolute; border-radius:50%; background: var(--leaf); opacity:.92; }
+  .b1{ width:150px; height:150px; left:10px; top:10px; }
+  .b2{ width:120px; height:120px; left:130px; top:0px; background:var(--leaf-deep); }
+  .b3{ width:110px; height:110px; left:60px; top:40px; opacity:.85;}
+  .b4{ width:90px; height:90px; left:170px; top:60px; }
+  .apple{ position:absolute; font-size:1.5rem; line-height:1; animation: drop .55s cubic-bezier(.3,1.4,.5,1) both; text-align:center; }
+  .apple .tag{ position:absolute; top:100%; left:50%; transform:translateX(-50%); background:#fff; color:var(--plum); font-size:.62rem; font-weight:800; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 10px -4px rgba(0,0,0,.3); margin-top:2px; }
+  @keyframes drop{ from{ transform: translateY(-120px) scale(.6); opacity:0;} to{ transform: translateY(0) scale(1); opacity:1;} }
+  .tree-form{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .tree-form input{ flex:1; min-width:180px; }
+
+  .heart-stage{ display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:12px; }
+  .heart-big{ font-size:4.4rem; transition: transform .3s ease; }
+  .heart-big.pulse{ animation: heartbeat 1.1s ease-in-out infinite; }
+  @keyframes heartbeat{ 0%,100%{ transform:scale(1);} 25%{transform:scale(1.15);} 40%{transform:scale(1);} 60%{transform:scale(1.1);} }
+  .heart-msg{ font-family:'Baloo 2'; font-size:1.15rem; color: var(--coral-deep); text-align:center; max-width:480px; min-height:1.4em; }
+  .confetti-piece{ position:fixed; top:-20px; font-size:1.3rem; pointer-events:none; z-index:30; animation: fall linear forwards; }
+  @keyframes fall{ to{ transform: translateY(100vh) rotate(360deg); opacity:0; } }
+
+  .final-check{ display:none; text-align:center; }
+  .final-check.shown{ display:block; animation: pop .4s ease; }
+  .final-form{ display:flex; flex-direction:column; gap:12px; margin-top:16px; }
+
+  .toast{
+    position:fixed; left:50%; bottom:9vh; transform:translateX(-50%) translateY(20px);
+    background: var(--plum); color:#fff; font-weight:700; font-size:.85rem;
+    padding:10px 18px; border-radius:999px; z-index:50; opacity:0; pointer-events:none;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+  @media (max-width: 640px){
+    .flip-grid{ grid-template-columns: 1fr 1fr; }
+    .flip-card{ height:120px; }
+    .nav-arrow{ width:42px; height:42px; font-size:1.05rem; }
+    .card{ padding:20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sky">
+  <div class="sun"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="cloud c3"></div>
+  <div class="hill"></div>
+</div>
+
+<div class="progressbar" id="progressbar" style="width:0%"></div>
+<div class="counter" id="counter">1 / 11</div>
+
+<button class="nav-arrow nav-prev" id="prevBtn" aria-label="Артқа">‹</button>
+<button class="nav-arrow nav-next" id="nextBtn" aria-label="Алға">›</button>
+
+<div class="deck" id="deck">
+
+  <section class="slide title-slide active" data-index="0">
+    <div class="card">
+      <div class="balloon-row"><span class="balloon">🎈</span><span class="balloon">🧸</span><span class="balloon">🎈</span></div>
+      <h1>3 ЖАС — ҮЛКЕН ӘЛЕМГЕ<br>АЛҒАШҚЫ ҚАДАМ</h1>
+      <div class="sub">Әр бала — қайталанбас әлем ❤️</div>
+      <div class="meta">🌷 Ата-аналар жиналысы · 3 жастағы балалар тобы</div>
+      <div style="margin-top:32px;"><button class="btn" onclick="goTo(1)">Жиналысты бастау →</button></div>
+    </div>
+  </section>
+
+  <section class="slide" data-index="1">
+    <div class="card">
+      <span class="eyebrow-badge">🌷 Қарсы алу</span>
+      <h2 class="headline">Қош келдіңіздер!</h2>
+      <p class="lede">Бүгінгі кездесуімізге уақыт бөліп келгендеріңізге рақмет. Бүгін біз ұзақ жиналыс жасап, тек ақпарат беріп қана қоймаймыз — бір сәтке балаларымыздың кішкентай әлеміне бірге саяхат жасап көреміз.</p>
+      <div class="quote">❤️ Мына жүрекшені әзірге өзіңізде ұстай тұрыңыз. Жиналыстың соңында оның не үшін берілгенін білесіздер.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-index="2">
+    <div class="card">
+      <span class="eyebrow-badge">🌸 Кіріспе сөз</span>
+      <h2 class="headline">Неге бұл кездесу ерекше?</h2>
+      <p class="lede">Балаларымыз қазір 3 жаста — бұл өмірдегі өте маңызды кезең. Балабақша — жаңа орта, жаңа достар, жаңа тәртіп, жаңа әсерлер әлемі.</p>
+      <div class="quote">«Өзім істеймін!» деуі — бізге қарсы шығуы емес, өз бетінше әрекет етуге деген алғашқы қадамы.</div>
+      <p class="lede">Сондықтан біздің мақсатымыз — баланы үнемі түзету емес, оны түсініп, дұрыс бағыт көрсету.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-index="3">
+    <div class="card">
+      <span class="eyebrow-badge">🧸 Кішкентай тапсырма</span>
+      <h2 class="headline">Мен баламды қаншалықты білемін?</h2>
+      <p class="lede" style="margin-bottom:0;">Көп ойланбай, ойыңызға бірінші келген жауапты жазыңыз.</p>
+      <div class="quiz-grid">
+        <div class="quiz-item"><label>Баланың аты (міндетті емес)</label><input type="text" id="q0" placeholder="Мыс.: Айару"></div>
+        <div class="quiz-item"><label>1. Баламның сүйікті ойыншығы қандай?</label><input type="text" id="q1" placeholder="Жауабыңыз..."></div>
+        <div class="quiz-item"><label>2. Балам қандай түсті жақсы көреді?</label><input type="text" id="q2" placeholder="Жауабыңыз..."></div>
+        <div class="quiz-item"><label>3. Баламды ең тез не қуантады?</label><input type="text" id="q3" placeholder="Жауабыңыз..."></div>
+        <div class="quiz-item"><label>4. Балам ренжіген кезде мен оны қалай жұбатамын?</label><input type="text" id="q4" placeholder="Жауабыңыз..."></div>
+        <div class="quiz-item"><label>5. ⭐ Баламның ең жақсы қасиеті қандай?</label><input type="text" id="q5" placeholder="Жауабыңыз..."></div>
+      </div>
+      <div style="margin-top:16px;">
+        <button class="btn" onclick="saveQuiz()">Жіберу ✓</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-index="4">
+    <div class="card">
+      <span class="eyebrow-badge">🎈 Түсіну</span>
+      <h2 class="headline">3 жастағы бала қандай?</h2>
+      <p class="lede" style="margin-bottom:0;">Балаңыз осы сөздерді жиі айта ма? Түсінігін білу үшін карточканы басыңыз 👇</p>
+      <div class="flip-grid">
+        <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner">
+          <div class="flip-face flip-front">«ӨЗІМ!»<span class="tap">басып көріңіз</span></div>
+          <div class="flip-face flip-back">Бала дербестікке ұмтылып жатыр 💪</div>
+        </div></div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner">
+          <div class="flip-face flip-front">«ЖОҚ!»<span class="tap">басып көріңіз</span></div>
+          <div class="flip-face flip-back">Өз пікірінің бар екенін көрсетуі 🗣️</div>
+        </div></div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner">
+          <div class="flip-face flip-front">«НЕГЕ?»<span class="tap">басып көріңіз</span></div>
+          <div class="flip-face flip-back">Айналасын танып-білуге деген қызығушылығы 🔍</div>
+        </div></div>
+        <div class="flip-card" onclick="this.classList.toggle('flipped')"><div class="flip-inner">
+          <div class="flip-face flip-front">Жылау, ашулану<span class="tap">басып көріңіз</span></div>
+          <div class="flip-face flip-back">Эмоциясын әлі толық басқара алмайды 🌊</div>
+        </div></div>
+      </div>
+      <div class="quote plain" style="margin-top:20px;">«Сен қазір ренжіп тұрсың. Мен сені түсініп тұрмын. Кел, бірге тынышталып алайық.» — алдымен сезімін қабылдаған дұрыс.</div>
+    </div>
+  </section>
+
+  <section class="slide" data-index="5">
+    <div class="card">
+      <span class="eyebrow-badge">🎭 Елестетіп көрейік</span>
+      <h2 class="headline">Егер бұл менің балам болса…</h2>
+      <div class="scenario">
+        <p class="q">Балаңыз аяқ киімін өзі кигісі келеді, бірақ 5 минут болды, әлі кие алмай отыр. Асығып тұрсыз. Не істейсіз?</p>
+        <button class="btn secondary" onclick="revealScenario(this)">Ұсынысты көру</button>
+        <div class="reveal-box"><p class="good">✅ Мүмкіндік болса, балаға өзі жасап көруге уақыт беріңіз.</p></div>
+      </div>
+      <div class="scenario">
+        <p class="q">Бала ойыншықтарын жинағысы келмейді. Не істейсіз?</p>
+        <button class="btn secondary" onclick="revealScenario(this)">Ұсынысты көру</button>
+        <div class="reveal-box">
+          <p class="bad">❌ «Жинамасаң, ойыншығыңды алып қоямын!»</p>
+          <p class="good">✅ «Қане, екеуіміз бірге жинайық. Сен машиналарды жина, мен қуыршақтарды жинаймын.»</p>
+        </div>
+      </div>
+      <p class="lede" style="margin-top:14px; font-size:.92rem;">3 жаста балаға ұзақ түсіндіруден гөрі ойын арқылы көрсету тиімді.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-index="6">
+    <div class="card" style="text-align:center;">
+      <span class="eyebrow-badge">🎨 Бір сәтке бала болайық</span>
+      <h2 class="headline">Балаңыздың суретін салыңыз</h2>
+      <p class="lede">Бар болғаны 30 секунд! Дайын болғанда батырманы басыңыз ⏱️</p>
+      <div class="timer-wrap">
+        <div class="timer-ring">
+          <svg width="180" height="180"><circle class="bg" cx="90" cy="90" r="80"></circle><circle class="fg" id="timerFg" cx="90" cy="90" r="80"></circle></svg>
+          <div class="timer-num" id="timerNum">30</div>
+        </div>
+        <div class="timer-msg" id="timerMsg">Дайын болғанда бастаңыз</div>
+        <div style="display:flex; gap:12px;">
+          <button class="btn" id="timerStart" onclick="startTimer()">Бастау ▶</button>
+          <button class="btn secondary" onclick="resetTimer()">Қайта бастау ↺</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" data-index="7">
+    <div class="card">
+      <span class="eyebrow-badge">🌳 Біздің баланың ағашы</span>
+      <h2 class="headline">Әр алмаға жақсы қасиетін жазайық</h2>
+      <p class="lede" style="margin-bottom:0;">Мысалы: мейірімді, көңілді, батыл, қамқор, ақылды, ізденімпаз...</p>
+      <div class="tree-area" id="treeArea">
+        <div class="canopy"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+        <div class="trunk"></div>
+      </div>
+      <div class="tree-form">
+        <input type="text" id="appleInput" placeholder="Баланың бір жақсы қасиетін жазыңыз...">
+        <button class="btn green" onclick="addApple()">🍎 Алма қосу</button>
+      </div>
+      <p class="lede" style="margin-top:12px; font-size:.9rem;">Баланың тамыры — отбасы. Ал оның жақсы қасиеттері — осы жемістер.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-index="8">
+    <div class="card" style="text-align:center;">
+      <span class="eyebrow-badge">❤️ Балам үшін бір ауыз сөз</span>
+      <h2 class="headline">«Балам, мен сені жақсы көремін, себебі…»</h2>
+      <div class="heart-stage">
+        <input type="text" id="heartInput" placeholder="...себебі" style="max-width:420px;">
+        <button class="btn" onclick="showHeart()">Жүрекке жазу ❤️</button>
+        <div class="heart-big" id="heartBig">🤍</div>
+        <div class="heart-msg" id="heartMsg"></div>
+      </div>
+      <p class="lede" style="margin-top:10px; font-size:.9rem;">Бұл жүрекшелерді балаларыңызға береміз — ата-ананың бір ауыз жылы сөзі бала үшін үлкен күш.</p>
+    </div>
+  </section>
+
+  <section class="slide" data-index="9">
+    <div class="card">
+      <span class="eyebrow-badge">🌷 Қорытынды</span>
+      <h2 class="headline">Кішкентай қадамдар — үлкен жетістіктер</h2>
+      <ul class="points">
+        <li><span class="dot">👟</span> Аяқ киімін өзі кию — жетістік.</li>
+        <li><span class="dot">🗣️</span> Өз ойын айту — жетістік.</li>
+        <li><span class="dot">🤝</span> Досымен ойыншық бөлісу — жетістік.</li>
+        <li><span class="dot">🙂</span> Жыламай қоштасып қалу — жетістік.</li>
+      </ul>
+      <div class="quote">Балаға мінсіз ата-ана емес, оны түсінуге тырысатын ата-ана керек.</div>
+      <p class="lede">Бірге жұмыс жасасақ, балаларымыздың балабақшадағы алғашқы қадамдары қуанышты әрі әдемі естелікке айналады. ❤️</p>
+      <p class="lede" style="font-family:'Baloo 2'; color:var(--leaf-deep); font-weight:700;">🌈 Біздің ортақ мақсатымыз — бақытты бала!</p>
+    </div>
+  </section>
+
+  <section class="slide" data-index="10">
+    <div class="card" style="text-align:center;">
+      <span class="eyebrow-badge">🎁 Кішкентай тосынсый</span>
+      <h2 class="headline">«Бүгін мен балам үшін…»</h2>
+      <p class="lede">Бір кішкентай уәде жазыңыз. Мысалы: «Күн сайын баламды кемінде бір рет құшақтаймын» ❤️</p>
+      <div class="final-form" id="promiseForm" style="max-width:460px; margin:0 auto;">
+        <input type="text" id="promiseName" placeholder="Баланың аты (міндетті емес)">
+        <textarea id="promiseText" placeholder="Уәдеңізді осында жазыңыз..."></textarea>
+        <button class="btn" onclick="savePromise()">Сақтау ✨</button>
+      </div>
+      <div class="final-check" id="finalCheck">
+        <div style="font-size:3rem;">🌟</div>
+        <p class="headline" style="font-size:1.3rem;">Осы қағазды өзіңізге қалдырыңыз</p>
+        <p class="lede">Келгендеріңізге көп рақмет!</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { firebaseConfig, RESPONSES_COLLECTION, readLocalResponses, writeLocalResponses } from "./firebase-config.js";
+
+  let db = null;
+  try{
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+  }catch(e){
+    console.warn("Firebase қосылмады (firebase-config.js толтырылмаған болуы мүмкін):", e);
+  }
+
+  async function saveToFirebase(type, payload){
+    const entry = { type, ...payload, createdAt: new Date().toISOString() };
+
+    if(db){
+      try{
+        await addDoc(collection(db, RESPONSES_COLLECTION), { ...entry, createdAt: serverTimestamp() });
+        showToast("✓ Сақталды");
+        return;
+      }catch(e){
+        console.warn("Firebase save failed, switching to local storage:", e);
+      }
+    }
+
+    const all = readLocalResponses();
+    all.unshift(entry);
+    writeLocalResponses(all);
+    showToast("✓ Сақталды");
+  }
+
+  window.__saveToFirebase = saveToFirebase;
+</script>
+
+<script>
+  function showToast(msg){
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(()=> t.classList.remove('show'), 2200);
+  }
+
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let current = 0;
+
+  const dotsWrap = document.getElementById('dots');
+  slides.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'dot' + (i === 0 ? ' active' : '');
+    b.addEventListener('click', () => goTo(i));
+    dotsWrap.appendChild(b);
+  });
+  const dotEls = Array.from(dotsWrap.children);
+
+  function updateUI(){
+    dotEls.forEach((d,i)=> d.classList.toggle('active', i===current));
+    document.getElementById('counter').textContent = (current+1) + ' / ' + total;
+    document.getElementById('progressbar').style.width = ((current+1)/total*100) + '%';
+    document.getElementById('prevBtn').disabled = current === 0;
+    document.getElementById('nextBtn').disabled = current === total-1;
+  }
+
+  function goTo(index){
+    if(index < 0 || index >= total || index === current) return;
+    const dir = index > current ? 'next' : 'prev';
+    slides[current].classList.remove('active');
+    slides[current].classList.add(dir === 'next' ? 'leaving-next' : 'leaving-prev');
+    setTimeout(()=> slides[current].classList.remove('leaving-next','leaving-prev'), 600);
+    current = index;
+    slides[current].classList.add('active');
+    updateUI();
+  }
+
+  document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+  document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowRight') goTo(current+1);
+    if(e.key === 'ArrowLeft') goTo(current-1);
+  });
+  let touchX = null;
+  document.addEventListener('touchstart', e=> touchX = e.touches[0].clientX);
+  document.addEventListener('touchend', e=>{
+    if(touchX === null) return;
+    const dx = e.changedTouches[0].clientX - touchX;
+    if(Math.abs(dx) > 50){ dx < 0 ? goTo(current+1) : goTo(current-1); }
+    touchX = null;
+  });
+  updateUI();
+
+  function revealScenario(btn){
+    const box = btn.nextElementSibling;
+    box.classList.toggle('shown');
+    btn.textContent = box.classList.contains('shown') ? 'Жасыру' : 'Ұсынысты көру';
+  }
+
+  function saveQuiz(){
+    const payload = {
+      childName: document.getElementById('q0').value.trim(),
+      favoriteToy: document.getElementById('q1').value.trim(),
+      favoriteColor: document.getElementById('q2').value.trim(),
+      whatMakesHappy: document.getElementById('q3').value.trim(),
+      howComforted: document.getElementById('q4').value.trim(),
+      bestQuality: document.getElementById('q5').value.trim(),
+    };
+    window.__saveToFirebase('quiz', payload);
+  }
+
+  let timerInterval = null;
+  const CIRC = 2 * Math.PI * 80;
+  function startTimer(){
+    const fg = document.getElementById('timerFg');
+    const num = document.getElementById('timerNum');
+    const msg = document.getElementById('timerMsg');
+    const startBtn = document.getElementById('timerStart');
+    let t = 30;
+    clearInterval(timerInterval);
+    fg.style.stroke = 'var(--coral)';
+    fg.style.strokeDashoffset = 0;
+    num.textContent = t;
+    msg.textContent = 'Сала беріңіз...';
+    startBtn.disabled = true;
+    timerInterval = setInterval(()=>{
+      t--;
+      num.textContent = t;
+      fg.style.strokeDashoffset = CIRC * (1 - t/30);
+      if(t <= 5) fg.style.stroke = '#E85A45';
+      if(t <= 0){
+        clearInterval(timerInterval);
+        msg.textContent = '✨ Дайын! Суреттеріңізге қараңыздар.';
+        startBtn.disabled = false;
+      }
+    }, 1000);
+  }
+  function resetTimer(){
+    clearInterval(timerInterval);
+    const fg = document.getElementById('timerFg');
+    fg.style.stroke = 'var(--coral)';
+    fg.style.strokeDashoffset = 0;
+    document.getElementById('timerNum').textContent = 30;
+    document.getElementById('timerMsg').textContent = 'Дайын болғанда бастаңыз';
+    document.getElementById('timerStart').disabled = false;
+  }
+
+  function addApple(){
+    const input = document.getElementById('appleInput');
+    const text = input.value.trim();
+    if(!text) return;
+    const area = document.getElementById('treeArea');
+    const apple = document.createElement('div');
+    apple.className = 'apple';
+    apple.textContent = '🍎';
+    const left = 38 + Math.random()*180;
+    const top = 20 + Math.random()*90;
+    apple.style.left = left + 'px';
+    apple.style.top = top + 'px';
+    const tag = document.createElement('div');
+    tag.className = 'tag';
+    tag.textContent = text;
+    apple.appendChild(tag);
+    area.appendChild(apple);
+    input.value = '';
+    window.__saveToFirebase('apple', { quality: text });
+  }
+  document.getElementById('appleInput').addEventListener('keydown', e=>{ if(e.key === 'Enter') addApple(); });
+
+  function showHeart(){
+    const val = document.getElementById('heartInput').value.trim();
+    const big = document.getElementById('heartBig');
+    const msg = document.getElementById('heartMsg');
+    big.textContent = '❤️';
+    big.classList.add('pulse');
+    msg.textContent = val ? ('«...себебі ' + val + '» ❤️') : '«Балам, мен сені қандай болсаң, солай жақсы көремін.» ❤️';
+    for(let i=0;i<14;i++){
+      setTimeout(()=>{
+        const c = document.createElement('div');
+        c.className = 'confetti-piece';
+        c.textContent = ['❤️','🌸','✨','🎈'][Math.floor(Math.random()*4)];
+        c.style.left = Math.random()*100 + 'vw';
+        c.style.animationDuration = (2 + Math.random()*1.5) + 's';
+        c.style.fontSize = (1 + Math.random()*0.8) + 'rem';
+        document.body.appendChild(c);
+        setTimeout(()=> c.remove(), 3600);
+      }, i*60);
+    }
+    window.__saveToFirebase('heart', { reason: val });
+  }
+
+  function savePromise(){
+    const name = document.getElementById('promiseName').value.trim();
+    const text = document.getElementById('promiseText').value.trim();
+    document.getElementById('promiseForm').style.display = 'none';
+    document.getElementById('finalCheck').classList.add('shown');
+    window.__saveToFirebase('promise', { childName: name, promise: text });
+  }
+</script>
+</body>
+</html>

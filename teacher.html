@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Жауаптар — тәрбиеші үшін</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#FFFBF2; --coral:#FF6F59; --coral-deep:#E85A45; --yellow:#FFC93C;
+    --leaf:#4CAF7D; --leaf-deep:#3B8F63; --plum:#3A2E39; --plum-soft:#6b5c68;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; font-family:'Nunito',sans-serif; background:var(--cream); color:var(--plum); padding: 24px 16px 60px; }
+  h1{ font-family:'Baloo 2',sans-serif; font-size:1.5rem; color:var(--coral-deep); margin:0 0 4px; }
+  p.sub{ color:var(--plum-soft); font-weight:700; margin:0 0 22px; font-size:.9rem; }
+  .toolbar{ display:flex; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+  button{
+    font-family:'Baloo 2',sans-serif; font-weight:700; border:none; cursor:pointer;
+    padding:10px 20px; border-radius:999px; background:var(--coral); color:#fff; font-size:.9rem;
+  }
+  button.secondary{ background:transparent; border:2px solid var(--coral); color:var(--coral-deep); }
+  section{ margin-bottom: 32px; }
+  section h2{ font-family:'Baloo 2',sans-serif; font-size:1.15rem; margin:0 0 12px; display:flex; align-items:center; gap:8px; }
+  .card{
+    background:#fff; border-radius:16px; padding:14px 18px; margin-bottom:10px;
+    box-shadow: 0 8px 20px -14px rgba(58,46,57,0.4);
+  }
+  .card .name{ font-weight:800; color:var(--leaf-deep); font-size:.85rem; margin-bottom:4px; }
+  .card .time{ float:right; font-size:.72rem; color:var(--plum-soft); font-weight:700; }
+  .card .row{ font-size:.92rem; margin:3px 0; }
+  .card .row b{ color: var(--coral-deep); }
+  .empty{ color:var(--plum-soft); font-weight:700; font-size:.9rem; }
+  #status{ font-size:.85rem; color:var(--plum-soft); font-weight:700; margin-bottom:16px; }
+</style>
+</head>
+<body>
+  <h1>🌷 Ата-аналар жиналысы — жауаптар</h1>
+  <p class="sub">Осы бет барлық сақталған жауаптарды көрсетеді (тек тәрбиеші үшін).</p>
+  <div class="toolbar">
+    <button onclick="loadAll()">Жаңарту ↺</button>
+    <button class="secondary" onclick="exportCSV()">CSV жүктеп алу ⬇</button>
+  </div>
+  <div id="status">Жүктелуде...</div>
+
+  <section><h2>📝 «Мен баламды қаншалықты білемін?» жауаптары</h2><div id="quizList"></div></section>
+  <section><h2>🍎 Ағашқа қосылған қасиеттер</h2><div id="appleList"></div></section>
+  <section><h2>❤️ Жүрек хабарламалары</h2><div id="heartList"></div></section>
+  <section><h2>🎁 Уәделер</h2><div id="promiseList"></div></section>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { firebaseConfig, RESPONSES_COLLECTION, readLocalResponses } from "./firebase-config.js";
+
+  let db = null;
+  try{
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+  }catch(e){ console.error(e); }
+
+  let allDocs = [];
+
+  function fmtTime(ts){
+    if(!ts) return '';
+    if(typeof ts === 'string') return new Date(ts).toLocaleString('kk-KZ');
+    if(ts.toDate) return ts.toDate().toLocaleString('kk-KZ');
+    return String(ts);
+  }
+
+  function renderCard(container, html){
+    const div = document.createElement('div');
+    div.className = 'card';
+    div.innerHTML = html;
+    container.appendChild(div);
+  }
+
+  function renderDocs() {
+    const statusEl = document.getElementById('status');
+    const quizList = document.getElementById('quizList');
+    const appleList = document.getElementById('appleList');
+    const heartList = document.getElementById('heartList');
+    const promiseList = document.getElementById('promiseList');
+
+    ['quizList','appleList','heartList','promiseList'].forEach(id => document.getElementById(id).innerHTML = '');
+
+    statusEl.textContent = 'Барлығы: ' + allDocs.length + ' жазба · соңғы жаңарту: ' + new Date().toLocaleTimeString('kk-KZ');
+
+    let quizN=0, appleN=0, heartN=0, promiseN=0;
+
+    allDocs.forEach(d => {
+      const time = fmtTime(d.createdAt);
+      if(d.type === 'quiz'){
+        quizN++;
+        renderCard(quizList, `<span class="time">${time}</span>
+          <div class="name">${d.childName || 'Аты жазылмаған'}</div>
+          <div class="row"><b>Ойыншық:</b> ${d.favoriteToy||'—'}</div>
+          <div class="row"><b>Түс:</b> ${d.favoriteColor||'—'}</div>
+          <div class="row"><b>Не қуантады:</b> ${d.whatMakesHappy||'—'}</div>
+          <div class="row"><b>Қалай жұбатады:</b> ${d.howComforted||'—'}</div>
+          <div class="row"><b>⭐ Ең жақсы қасиеті:</b> ${d.bestQuality||'—'}</div>`);
+      }
+      if(d.type === 'apple'){
+        appleN++;
+        renderCard(appleList, `<span class="time">${time}</span><div class="row">🍎 ${d.quality||'—'}</div>`);
+      }
+      if(d.type === 'heart'){
+        heartN++;
+        renderCard(heartList, `<span class="time">${time}</span><div class="row">❤️ ...себебі ${d.reason||'—'}</div>`);
+      }
+      if(d.type === 'promise'){
+        promiseN++;
+        renderCard(promiseList, `<span class="time">${time}</span>
+          <div class="name">${d.childName || 'Аты жазылмаған'}</div>
+          <div class="row">🎁 ${d.promise||'—'}</div>`);
+      }
+    });
+
+    if(quizN===0) quizList.innerHTML = '<p class="empty">Әзірге жауап жоқ.</p>';
+    if(appleN===0) appleList.innerHTML = '<p class="empty">Әзірге жазба жоқ.</p>';
+    if(heartN===0) heartList.innerHTML = '<p class="empty">Әзірге жазба жоқ.</p>';
+    if(promiseN===0) promiseList.innerHTML = '<p class="empty">Әзірге жазба жоқ.</p>';
+  }
+
+  window.loadAll = async function(){
+    const statusEl = document.getElementById('status');
+    statusEl.textContent = 'Жүктелуде...';
+
+    try{
+      if(db){
+        const q = query(collection(db, RESPONSES_COLLECTION), orderBy('createdAt', 'desc'));
+        const snap = await getDocs(q);
+        allDocs = [];
+        snap.forEach(d => allDocs.push({ id: d.id, ...d.data() }));
+      } else {
+        allDocs = readLocalResponses();
+      }
+      renderDocs();
+    }catch(e){
+      console.error(e);
+      allDocs = readLocalResponses();
+      renderDocs();
+      statusEl.textContent = '⚠ Firebase қате шықты, бірақ локальдік жазбалар жүктелді. ' + e.message;
+    }
+  };
+
+  window.exportCSV = function(){
+    if(!allDocs.length){ alert('Жүктелген жазба жоқ.'); return; }
+    const rows = [['type','childName','favoriteToy','favoriteColor','whatMakesHappy','howComforted','bestQuality','quality','reason','promise','createdAt']];
+    allDocs.forEach(d=>{
+      rows.push([
+        d.type||'', d.childName||'', d.favoriteToy||'', d.favoriteColor||'', d.whatMakesHappy||'',
+        d.howComforted||'', d.bestQuality||'', d.quality||'', d.reason||'', d.promise||'',
+        fmtTime(d.createdAt)
+      ]);
+    });
+    const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g,'""') + '"').join(',')).join('\n');
+    const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'ata-analar-jauaptar.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  loadAll();
+</script>
+</body>
+</html>
