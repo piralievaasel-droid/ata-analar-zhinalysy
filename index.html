@@ -29,6 +29,7 @@
     color:var(--plum);
     background:var(--cream);
     -webkit-tap-highlight-color: transparent;
+    touch-action: pan-y;
   }
   h1,h2,h3,.display{
     font-family:'Baloo 2', sans-serif;
@@ -78,6 +79,10 @@
     transform: scale(0.94) translateY(10px);
     transition: opacity .55s cubic-bezier(.4,0,.2,1), transform .55s cubic-bezier(.4,0,.2,1), visibility 0s linear .55s;
     overflow-y:auto;
+    overflow-x:hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
   }
   .slide.active{
     opacity:1; visibility:visible; transform: scale(1) translateY(0);
@@ -89,7 +94,7 @@
 
   .card{
     background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow);
-    max-width: 880px; width:100%; max-height: 100%;
+    max-width: 880px; width:100%; max-height:none; min-height:0;
     padding: clamp(24px,4vw,56px); position:relative;
   }
 
@@ -153,6 +158,36 @@
   .title-slide h1{ font-size: clamp(1.9rem, 5vw, 3.1rem); color: var(--coral-deep); line-height:1.15; }
   .title-slide .sub{ font-family:'Baloo 2', sans-serif; font-size: clamp(1.05rem, 2vw, 1.4rem); color: var(--leaf-deep); margin-top:14px; font-weight:600; }
   .title-slide .meta{ margin-top:26px; color:var(--plum-soft); font-weight:700; }
+  .photo-collage{
+    position:relative; margin: 26px auto 18px; max-width: 820px; width:100%;
+    padding: 18px; border-radius: 30px; background: rgba(255,255,255,0.46);
+    box-shadow: 0 18px 40px -26px rgba(58,46,57,0.30); border: 1px solid rgba(255,255,255,0.72);
+  }
+  .photo-collage-inner{ display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; }
+  .photo-card{
+    position:relative; aspect-ratio:1; border-radius: 18px; overflow:hidden; border:2px solid rgba(255,255,255,0.88);
+    box-shadow: 0 12px 18px -14px rgba(58,46,57,0.30); background-size: cover; background-position:center; background-repeat:no-repeat;
+    background: linear-gradient(180deg, #FFE6CC, #F9D7C5 48%, #D8F1FF);
+  }
+  .photo-card::before{ content:""; position:absolute; inset:0; background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(58,46,57,0.10)); }
+  .photo-card .emoji{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:3.4rem; z-index:0; opacity:.8; }
+  .photo-card.has-photo{ background-size: cover; background-position: center; background-repeat:no-repeat; }
+  .photo-card.has-photo .emoji{ display:none; }
+  .photo-card:nth-child(1){ background: linear-gradient(180deg, #FFE4B1, #FBC68A); }
+  .photo-card:nth-child(2){ background: linear-gradient(180deg, #D7F3FF, #B4E5F8); }
+  .photo-card:nth-child(3){ background: linear-gradient(180deg, #E5F8CF, #C3E7A8); }
+  .photo-card:nth-child(4){ background: linear-gradient(180deg, #FFD6D8, #FBB4C0); }
+  .photo-card:nth-child(5){ background: linear-gradient(180deg, #E3E1FF, #C7C7FF); }
+  .photo-card:nth-child(6){ background: linear-gradient(180deg, #F9E7C7, #F5D5A2); }
+  .photo-card:nth-child(7){ background: linear-gradient(180deg, #D8F0D1, #B9E4AF); }
+  .photo-card:nth-child(8){ background: linear-gradient(180deg, #D9E7FF, #B9D2FF); }
+  .photo-card:nth-child(9){ background: linear-gradient(180deg, #FCE4E9, #F8C1D8); }
+  .photo-card:nth-child(10){ background: linear-gradient(180deg, #DDF7EA, #B7E9D0); }
+  .photo-card:nth-child(11){ background: linear-gradient(180deg, #FFE7C8, #FDD791); }
+  .photo-card:nth-child(12){ background: linear-gradient(180deg, #E1F0FF, #C9DFFB); }
+  @media (max-width: 640px){
+    .photo-collage-inner{ grid-template-columns: repeat(3, minmax(0,1fr)); }
+  }
 
   .flip-grid{ display:grid; grid-template-columns: repeat(2,1fr); gap:16px; margin-top:22px; }
   .flip-card{ perspective:1200px; height:150px; cursor:pointer; }
@@ -182,16 +217,31 @@
   .timer-num{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2'; font-size:2.6rem; font-weight:700; color:var(--plum); }
   .timer-msg{ font-weight:800; color: var(--leaf-deep); text-align:center; min-height:1.4em; }
 
-  .tree-area{ position:relative; height:250px; margin-top:10px; }
-  .trunk{ position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:26px; height:80px; background: linear-gradient(180deg,#B98554,#8A5F39); border-radius:6px 6px 2px 2px; }
-  .canopy{ position:absolute; bottom:56px; left:50%; transform:translateX(-50%); width:280px; height:170px; }
-  .canopy .blob{ position:absolute; border-radius:50%; background: var(--leaf); opacity:.92; }
-  .b1{ width:150px; height:150px; left:10px; top:10px; }
-  .b2{ width:120px; height:120px; left:130px; top:0px; background:var(--leaf-deep); }
-  .b3{ width:110px; height:110px; left:60px; top:40px; opacity:.85;}
-  .b4{ width:90px; height:90px; left:170px; top:60px; }
+  .tree-area{ position:relative; height:360px; margin-top:8px; }
+  .trunk{ position:absolute; bottom:0; left:50%; transform:translateX(-50%); width:46px; height:154px; background: linear-gradient(180deg,#da9e6a,#8d5d3d); border-radius:12px 12px 6px 6px; box-shadow: inset -9px 0 12px rgba(92,55,29,0.22); }
+  .trunk::before, .trunk::after{
+    content:""; position:absolute; background: linear-gradient(180deg,#c78655,#7d4a31); border-radius:14px; width:18px; height:96px; top:22px;
+  }
+  .trunk::before{ left:-26px; transform: rotate(30deg); }
+  .trunk::after{ right:-26px; transform: rotate(-30deg); }
+  .canopy{ position:absolute; bottom:100px; left:50%; transform:translateX(-50%); width:430px; height:275px; }
+  .canopy .blob{
+    position:absolute; border-radius: 58% 42% 52% 48% / 54% 46% 54% 46%;
+    background: radial-gradient(circle at 35% 28%, #eefdc8 0%, #aee68a 18%, #68c16b 38%, #2e8f4e 72%, #1f633e 100%);
+    box-shadow: inset -16px -12px 18px rgba(24,87,45,0.18), 0 18px 24px -18px rgba(25,72,35,0.52);
+    border: 3px solid rgba(255,255,255,0.18);
+    opacity:.98;
+  }
+  .b1{ width:210px; height:180px; left:18px; top:44px; }
+  .b2{ width:200px; height:188px; left:178px; top:10px; }
+  .b3{ width:174px; height:176px; left:118px; top:80px; }
+  .b4{ width:160px; height:150px; left:252px; top:92px; }
+  .b5{ width:130px; height:130px; left:86px; top:16px; }
+  .b6{ width:130px; height:128px; left:236px; top:20px; }
+  .b7{ width:120px; height:118px; left:14px; top:122px; }
+  .b8{ width:122px; height:118px; left:294px; top:128px; }
   .apple{ position:absolute; font-size:1.5rem; line-height:1; animation: drop .55s cubic-bezier(.3,1.4,.5,1) both; text-align:center; }
-  .apple .tag{ position:absolute; top:100%; left:50%; transform:translateX(-50%); background:#fff; color:var(--plum); font-size:.62rem; font-weight:800; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 10px -4px rgba(0,0,0,.3); margin-top:2px; }
+  .apple .tag{ position:absolute; top:100%; left:50%; transform:translateX(-50%); background:#fff; color:var(--plum); font-size:.62rem; font-weight:800; padding:2px 7px; border-radius:8px; white-space:nowrap; box-shadow:0 4px 10px -4px rgba(0,0,0,.3); margin-top:2px; max-width:120px; overflow:hidden; text-overflow:ellipsis; }
   @keyframes drop{ from{ transform: translateY(-120px) scale(.6); opacity:0;} to{ transform: translateY(0) scale(1); opacity:1;} }
   .tree-form{ display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
   .tree-form input{ flex:1; min-width:180px; }
@@ -247,6 +297,24 @@
       <div class="balloon-row"><span class="balloon">🎈</span><span class="balloon">🧸</span><span class="balloon">🎈</span></div>
       <h1>3 ЖАС — ҮЛКЕН ӘЛЕМГЕ<br>АЛҒАШҚЫ ҚАДАМ</h1>
       <div class="sub">Әр бала — қайталанбас әлем ❤️</div>
+
+      <div class="photo-collage" aria-label="Балалар фотосуреттері">
+        <div class="photo-collage-inner">
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=80');"><div class="emoji">😄</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=800&q=80');"><div class="emoji">🤩</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80');"><div class="emoji">🌞</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=800&q=80');"><div class="emoji">😁</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80');"><div class="emoji">😃</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80');"><div class="emoji">😍</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1516627145497-ae6968895b74?auto=format&fit=crop&w=800&q=80');"><div class="emoji">😎</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?auto=format&fit=crop&w=800&q=80');"><div class="emoji">🤗</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=800&q=80');"><div class="emoji">🎉</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1519345182560-3f2917c472ef?auto=format&fit=crop&w=800&q=80');"><div class="emoji">✨</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=800&q=80');"><div class="emoji">🌈</div></div>
+          <div class="photo-card has-photo" style="background-image: url('https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=80');"><div class="emoji">💛</div></div>
+        </div>
+      </div>
+
       <div class="meta">🌷 Ата-аналар жиналысы · 3 жастағы балалар тобы</div>
       <div style="margin-top:32px;"><button class="btn" onclick="goTo(1)">Жиналысты бастау →</button></div>
     </div>
@@ -363,7 +431,16 @@
       <h2 class="headline">Әр алмаға жақсы қасиетін жазайық</h2>
       <p class="lede" style="margin-bottom:0;">Мысалы: мейірімді, көңілді, батыл, қамқор, ақылды, ізденімпаз...</p>
       <div class="tree-area" id="treeArea">
-        <div class="canopy"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div></div>
+        <div class="canopy">
+          <div class="blob b5"></div>
+          <div class="blob b1"></div>
+          <div class="blob b2"></div>
+          <div class="blob b3"></div>
+          <div class="blob b4"></div>
+          <div class="blob b6"></div>
+          <div class="blob b7"></div>
+          <div class="blob b8"></div>
+        </div>
         <div class="trunk"></div>
       </div>
       <div class="tree-form">
@@ -513,8 +590,10 @@
   document.addEventListener('touchstart', e=> touchX = e.touches[0].clientX);
   document.addEventListener('touchend', e=>{
     if(touchX === null) return;
-    const dx = e.changedTouches[0].clientX - touchX;
-    if(Math.abs(dx) > 50){ dx < 0 ? goTo(current+1) : goTo(current-1); }
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchX;
+    const dy = Math.abs(touch.clientY - e.changedTouches[0].clientY);
+    if(Math.abs(dx) > 50 && Math.abs(dx) > dy){ dx < 0 ? goTo(current+1) : goTo(current-1); }
     touchX = null;
   });
   updateUI();
@@ -581,10 +660,16 @@
     const apple = document.createElement('div');
     apple.className = 'apple';
     apple.textContent = '🍎';
-    const left = 38 + Math.random()*180;
-    const top = 20 + Math.random()*90;
-    apple.style.left = left + 'px';
-    apple.style.top = top + 'px';
+
+    const centerX = 150;
+    const centerY = 95;
+    const angle = Math.random() * Math.PI * 2;
+    const radius = 55 + Math.random() * 95;
+    const x = centerX + Math.cos(angle) * radius;
+    const y = centerY + Math.sin(angle) * radius * 0.8;
+
+    apple.style.left = x + 'px';
+    apple.style.top = y + 'px';
     const tag = document.createElement('div');
     tag.className = 'tag';
     tag.textContent = text;
